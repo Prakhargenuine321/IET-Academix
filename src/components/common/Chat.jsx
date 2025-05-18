@@ -17,11 +17,21 @@ const Chat = ({ type = 'community' }) => {
   
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
+
     if (!newMessage.trim()) return;
-    
-    const result = await sendMessage(newMessage);
-    
+
+    // Build the message object
+    const messageObj = {
+      content: newMessage,
+      sender: user?.id || 'student', // fallback if user is not defined
+      senderName: user?.name || 'Student',
+      senderRole: user?.role || 'student',
+      chatType: type,
+      timestamp: new Date().toISOString(),
+    };
+
+    const result = await sendMessage(messageObj);
+
     if (result.success) {
       setNewMessage('');
     }
@@ -35,29 +45,47 @@ const Chat = ({ type = 'community' }) => {
   
   // Render message bubbles
   const renderMessage = (message) => {
-    const isCurrentUser = message.sender === user.id;
-    
+    let isCurrentUser = false;
+    let isAI = false;
+  
+    if (type === 'ai') {
+      isAI = message.sender === 'ai';
+      isCurrentUser = message.sender === user.id;
+    } else {
+      isCurrentUser = message.sender === user.id;
+    }
+  
     return (
       <motion.div
         key={message.id}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`mb-4 flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+        className={`mb-4 flex ${
+          type === 'ai'
+            ? isAI
+              ? 'justify-start'
+              : 'justify-end'
+            : isCurrentUser
+              ? 'justify-end'
+              : 'justify-start'
+        }`}
       >
-        <div className={`max-w-[80%] ${isCurrentUser ? 'order-1' : 'order-2'}`}>
+        <div className={`max-w-[80%] ${type === 'ai' ? (isAI ? 'order-1' : 'order-2') : (isCurrentUser ? 'order-1' : 'order-2')}`}>
           <div className="flex items-center gap-2">
             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-white ${
-              message.senderRole === 'student' 
-                ? 'bg-primary-500' 
-                : message.senderRole === 'teacher' 
-                  ? 'bg-secondary-500' 
-                  : 'bg-accent-500'
+              isAI
+                ? 'bg-accent-500'
+                : message.senderRole === 'student'
+                  ? 'bg-primary-500'
+                  : message.senderRole === 'teacher'
+                    ? 'bg-secondary-500'
+                    : 'bg-accent-500'
             }`}>
-              {message.senderName.charAt(0)}
+              {isAI ? '🤖' : message.senderName?.charAt(0)}
             </div>
             <div>
               <p className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {message.senderName} 
+                {isAI ? 'AI Assistant' : message.senderName}
                 <span className="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">
                   • {formatTimestamp(message.timestamp)}
                 </span>
@@ -65,9 +93,9 @@ const Chat = ({ type = 'community' }) => {
             </div>
           </div>
           <div className={`mt-1 rounded-xl px-4 py-2 text-sm shadow-sm ${
-            isCurrentUser 
-              ? 'bg-primary-500 text-white' 
-              : 'bg-white text-gray-800 dark:bg-gray-700 dark:text-white'
+            (type === 'ai' && isAI) || (!type === 'ai' && !isCurrentUser)
+              ? 'bg-white text-gray-800 dark:bg-gray-700 dark:text-white'
+              : 'bg-primary-500 text-white'
           }`}>
             {message.content}
           </div>
@@ -118,6 +146,7 @@ const Chat = ({ type = 'community' }) => {
       
       {/* Messages container */}
       <div className="flex-1 overflow-y-auto p-4">
+        {/* if there is loading, show a loading spinner */}
         {loading && (
           <div className="flex h-full items-center justify-center">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-primary-500"></div>

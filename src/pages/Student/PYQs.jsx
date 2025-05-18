@@ -5,7 +5,8 @@ import { FiHelpCircle } from 'react-icons/fi';
 import FilterBar from '../../components/common/FilterBar';
 import ContentCard from '../../components/common/ContentCard';
 import EmptyState from '../../components/common/EmptyState';
-import { getResources } from '../../services/resourceService';
+import { fetchPYQs } from '../../../src/appwrite'; // Adjust the path if needed
+
 
 const PYQs = () => {
   const [pyqs, setPyqs] = useState([]);
@@ -24,7 +25,7 @@ const PYQs = () => {
     const fetchPyqs = async () => {
       try {
         setLoading(true);
-        const data = await getResources('pyqs');
+        const data = await fetchPYQs();
         setPyqs(data);
         setFilteredPyqs(data);
       } catch (error) {
@@ -33,7 +34,7 @@ const PYQs = () => {
         setLoading(false);
       }
     };
-    
+
     fetchPyqs();
   }, []);
   
@@ -135,15 +136,15 @@ const PYQs = () => {
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {filteredPyqs.map((pyq) => (
-            <motion.div key={pyq.id} variants={itemVariants}>
+            <motion.div key={pyq.$id} variants={itemVariants}>
               <ContentCard
-                id={pyq.id}
+                id={pyq.$id}
                 type="pyqs"
                 title={pyq.title}
                 description={pyq.description}
                 thumbnailUrl={pyq.thumbnailUrl}
-                uploadedBy={pyq.uploadedBy}
-                uploadDate={pyq.uploadDate}
+                uploadedBy={pyq.uploadedBy || "Admin"}
+                uploadDate={pyq.$createdAt}
                 branch={pyq.branch}
                 subject={pyq.subject}
                 stats={pyq.stats}

@@ -4,7 +4,7 @@ import { FiBookOpen } from 'react-icons/fi';
 import FilterBar from '../../components/common/FilterBar';
 import ContentCard from '../../components/common/ContentCard';
 import EmptyState from '../../components/common/EmptyState';
-import { getResources } from '../../services/resourceService';
+import { getResources } from '../../../src/appwrite';
 
 const Notes = () => {
   const [notes, setNotes] = useState([]);
@@ -17,8 +17,7 @@ const Notes = () => {
     subject: 'All',
     search: '',
   });
-  
-  // Fetch notes on component mount
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -32,54 +31,46 @@ const Notes = () => {
         setLoading(false);
       }
     };
-    
+
     fetchNotes();
   }, []);
-  
-  // Apply filters when filter state changes
+
   useEffect(() => {
     if (notes.length === 0) return;
-    
+
     let filtered = [...notes];
-    
-    // Apply branch filter
-    if (filters.branch && filters.branch !== 'All') {
+
+    if (filters.branch !== 'All') {
       filtered = filtered.filter(note => note.branch === filters.branch);
     }
-    
-    // Apply year filter
-    if (filters.year && filters.year !== 'All') {
+
+    if (filters.year !== 'All') {
       filtered = filtered.filter(note => note.year === filters.year);
     }
-    
-    // Apply semester filter
-    if (filters.semester && filters.semester !== 'All') {
+
+    if (filters.semester !== 'All') {
       filtered = filtered.filter(note => note.semester === filters.semester);
     }
-    
-    // Apply subject filter
-    if (filters.subject && filters.subject !== 'All') {
+
+    if (filters.subject !== 'All') {
       filtered = filtered.filter(note => note.subject === filters.subject);
     }
-    
-    // Apply search filter
+
     if (filters.search) {
       const searchTerm = filters.search.toLowerCase();
-      filtered = filtered.filter(note => 
-        note.title.toLowerCase().includes(searchTerm) || 
+      filtered = filtered.filter(note =>
+        note.title.toLowerCase().includes(searchTerm) ||
         note.description.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     setFilteredNotes(filtered);
   }, [filters, notes]);
-  
-  // Handle filter changes
+
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters);
   };
-  
-  // Animation variants
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -89,12 +80,12 @@ const Notes = () => {
       }
     }
   };
-  
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
   };
-  
+
   return (
     <div>
       <div className="mb-6">
@@ -103,9 +94,9 @@ const Notes = () => {
           Access study notes and materials
         </p>
       </div>
-      
+
       <FilterBar onFilterChange={handleFilterChange} />
-      
+
       {loading ? (
         <div className="flex h-60 items-center justify-center">
           <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-primary-500"></div>
@@ -131,7 +122,7 @@ const Notes = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 "
         >
           {filteredNotes.map((note) => (
             <motion.div key={note.id} variants={itemVariants}>
@@ -145,7 +136,11 @@ const Notes = () => {
                 uploadDate={note.uploadDate}
                 branch={note.branch}
                 subject={note.subject}
-                stats={note.stats}
+                likes={note.likes}
+                views={note.views}
+                downloads={note.downloads}
+                bookmarks={note.bookmarks}
+                additionalInfo={note.additionalInfo}
               />
             </motion.div>
           ))}

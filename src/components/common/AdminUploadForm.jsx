@@ -1,116 +1,118 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FiUpload, FiX, FiLink, FiFile } from 'react-icons/fi';
-import { addResource } from '../../services/resourceService';
-
-const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FiLink, FiFile } from "react-icons/fi";
+import {FaLaptop} from "react-icons/fa"
+ 
+const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, onCancel }) => {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    branch: 'Computer Science',
-    year: '1',
-    semester: '1',
-    subject: '',
-    fileUrl: '',
-    videoUrl: '',
-    thumbnailUrl: '',
-    uploadedBy: 'Admin',
+    title: "",
+    description: "",
+    branch: "Computer Science",
+    year: "1",
+    semester: "1",
+    subject: "",
+    fileUrl: "",
+    videoUrl: "",
+    thumbnailUrl: "",
+    uploadedBy: "Admin",
   });
-  
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title || "",
+        description: initialData.description || "",
+        branch: initialData.branch || "Computer Science",
+        year: initialData.year || "1",
+        semester: initialData.semester || "1",
+        subject: initialData.subject || "",
+        fileUrl: initialData.fileUrl || "",
+        videoUrl: initialData.videoUrl || "",
+        thumbnailUrl: initialData.thumbnailUrl || "",
+        uploadedBy: initialData.uploadedBy || "Admin",
+      });
+    }
+  }, [initialData]);
+
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  
+
   // Options for selects
-  const branchOptions = ['Computer Science', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering'];
-  const yearOptions = ['1', '2', '3', '4', 'All'];
-  const semesterOptions = ['1', '2', 'All'];
-  const subjectOptions = ['Data Structures', 'DBMS', 'Networks', 'Operating Systems', 'Machine Learning'];
-  
+  const branchOptions = [
+    "Computer Science",
+    "Electrical Engineering",
+    "Electronics Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
+  ];
+  const yearOptions = ["1", "2", "3", "4", "All"];
+  const semesterOptions = ["1", "2", "3", "4", "5", "6", "7", "8","All"];
+  const subjectOptions = [
+    "Data Structures",
+    "DBMS",
+    "Networks",
+    "Operating Systems",
+    "Machine Learning",
+    "Power Electronics",
+    "Natural Language Processing"
+  ];
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value || "",
+    }));
     setError(null);
   };
-  
+
   const validateForm = () => {
     if (!formData.title.trim()) {
-      setError('Title is required');
+      setError("Title is required");
       return false;
     }
-    
     if (!formData.description.trim()) {
-      setError('Description is required');
+      setError("Description is required");
       return false;
     }
-    
-    if (resourceType === 'videos' && !formData.videoUrl.trim()) {
-      setError('Video URL is required');
+    if (!formData.fileUrl.trim()) {
+      setError("File URL is required");
       return false;
     }
-    
-    if (resourceType !== 'videos' && !formData.fileUrl.trim()) {
-      setError('File URL is required');
-      return false;
-    }
-    
     return true;
   };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    if (isUploading) return;
     if (!validateForm()) return;
-    
+
     setIsUploading(true);
     setError(null);
-    
+
     try {
-      // Prepare data for upload
-      const dataToUpload = {
-        ...formData,
-        // For non-video resources, we don't need videoUrl
-        ...(resourceType !== 'videos' && { videoUrl: undefined }),
-        // For videos, we don't need fileUrl
-        ...(resourceType === 'videos' && { fileUrl: undefined }),
-        // Use placeholder thumbnail if not provided
-        thumbnailUrl: formData.thumbnailUrl || 'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg',
-        uploadDate: new Date().toISOString(),
+      const syllabusData = {
+        title: formData.title,
+        branch: formData.branch,
+        semester: formData.semester,
+        year: formData.year,
+        subject: formData.subject,
+        description: formData.description,
+        fileUrl: formData.fileUrl,
+        thumbnailUrl:
+          formData.thumbnailUrl || "https://via.placeholder.com/150",
       };
-      
-      const result = await addResource(resourceType, dataToUpload);
-      
-      // Reset form on success
-      setFormData({
-        title: '',
-        description: '',
-        branch: 'Computer Science',
-        year: '1',
-        semester: '1',
-        subject: '',
-        fileUrl: '',
-        videoUrl: '',
-        thumbnailUrl: '',
-        uploadedBy: 'Admin',
-      });
-      
+
+      await onUploadComplete(syllabusData);
       setSuccess(true);
-      
-      if (onUploadComplete) {
-        onUploadComplete(result);
-      }
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => {
-        setSuccess(false);
-      }, 3000);
     } catch (err) {
-      setError(err.message || 'An error occurred while uploading');
+      setError(err.message || "An error occurred while uploading");
     } finally {
       setIsUploading(false);
     }
   };
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -118,21 +120,24 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
       className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800"
     >
       <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
-        Upload {resourceType === 'pyqs' ? 'PYQs' : resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}
+        Upload{" "}
+        {resourceType === "pyqs"
+          ? "PYQs"
+          : resourceType.charAt(0).toUpperCase() + resourceType.slice(1)}
       </h2>
-      
+
       {success && (
         <div className="mb-4 rounded-lg bg-success-100 p-3 text-success-800 dark:bg-success-900/30 dark:text-success-300">
           Upload successful!
         </div>
       )}
-      
+
       {error && (
         <div className="mb-4 rounded-lg bg-error-100 p-3 text-error-800 dark:bg-error-900/30 dark:text-error-300">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="grid gap-4 md:grid-cols-2">
           {/* Title */}
@@ -150,7 +155,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               required
             />
           </div>
-          
+
           {/* Description */}
           <div className="md:col-span-2">
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -165,7 +170,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               required
             ></textarea>
           </div>
-          
+
           {/* Branch */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -185,7 +190,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               ))}
             </select>
           </div>
-          
+
           {/* Subject */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -205,7 +210,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               ))}
             </select>
           </div>
-          
+
           {/* Year */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -224,7 +229,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               ))}
             </select>
           </div>
-          
+
           {/* Semester */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -243,37 +248,41 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
               ))}
             </select>
           </div>
-          
-          {/* File or Video URL */}
+
+          {/* File URL */}
           <div className="md:col-span-2">
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              {resourceType === 'videos' ? 'Video URL*' : 'File URL*'}
+              {resourceType === "videos" ? "YouTube Video URL*" : "File URL*"}
             </label>
             <div className="relative">
               <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                {resourceType === 'videos' ? (
-                  <FiLink className="text-gray-500 dark:text-gray-400" />
+                {resourceType === "videos" ? (
+                  <FaLaptop className="text-gray-500 dark:text-gray-400" />
                 ) : (
                   <FiFile className="text-gray-500 dark:text-gray-400" />
                 )}
               </div>
               <input
                 type="text"
-                name={resourceType === 'videos' ? 'videoUrl' : 'fileUrl'}
-                value={resourceType === 'videos' ? formData.videoUrl : formData.fileUrl}
+                name="fileUrl"
+                value={formData.fileUrl}
                 onChange={handleChange}
                 className="input pl-10"
-                placeholder={resourceType === 'videos' ? 'Enter YouTube URL' : 'Enter file URL'}
+                placeholder={
+                  resourceType === "videos"
+                    ? "Enter YouTube video URL"
+                    : "Enter file URL"
+                }
                 required
               />
             </div>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {resourceType === 'videos' 
-                ? 'Paste a valid YouTube video URL' 
-                : 'Enter a valid URL to the PDF file'}
+              {resourceType === "videos"
+                ? "Enter a valid YouTube video URL."
+                : "Enter a valid URL to the PDF file."}
             </p>
           </div>
-          
+
           {/* Thumbnail URL */}
           <div className="md:col-span-2">
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -297,27 +306,14 @@ const AdminUploadForm = ({ resourceType, onUploadComplete }) => {
             </p>
           </div>
         </div>
-        
+
         <div className="mt-6 flex justify-end">
           <button
             type="submit"
             disabled={isUploading}
             className="btn btn-primary"
           >
-            {isUploading ? (
-              <span className="flex items-center">
-                <svg className="mr-2 h-4 w-4 animate-spin text-white" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Uploading...
-              </span>
-            ) : (
-              <span className="flex items-center">
-                <FiUpload className="mr-2" />
-                Upload
-              </span>
-            )}
+            {isUploading ? "Uploading..." : "Upload"}
           </button>
         </div>
       </form>

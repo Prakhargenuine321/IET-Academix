@@ -4,7 +4,7 @@ import { FiVideo } from 'react-icons/fi';
 import FilterBar from '../../components/common/FilterBar';
 import ContentCard from '../../components/common/ContentCard';
 import EmptyState from '../../components/common/EmptyState';
-import { getResources } from '../../services/resourceService';
+import { fetchVideos } from '../../../src/appwrite'; // Adjust the path as needed
 
 const Videos = () => {
   const [videos, setVideos] = useState([]);
@@ -20,10 +20,10 @@ const Videos = () => {
   
   // Fetch videos on component mount
   useEffect(() => {
-    const fetchVideos = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const data = await getResources('videos');
+        const data = await fetchVideos();
         setVideos(data);
         setFilteredVideos(data);
       } catch (error) {
@@ -32,8 +32,7 @@ const Videos = () => {
         setLoading(false);
       }
     };
-    
-    fetchVideos();
+    fetchData();
   }, []);
   
   // Apply filters when filter state changes
@@ -134,15 +133,15 @@ const Videos = () => {
           className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {filteredVideos.map((video) => (
-            <motion.div key={video.id} variants={itemVariants}>
+            <motion.div key={video.$id} variants={itemVariants}>
               <ContentCard
-                id={video.id}
+                id={video.$id}
                 type="videos"
                 title={video.title}
                 description={video.description}
                 thumbnailUrl={video.thumbnailUrl}
-                uploadedBy={video.uploadedBy}
-                uploadDate={video.uploadDate}
+                uploadedBy={video.uploadedBy || "Admin"}
+                uploadDate={video.$createdAt}
                 branch={video.branch}
                 subject={video.subject}
                 stats={video.stats}

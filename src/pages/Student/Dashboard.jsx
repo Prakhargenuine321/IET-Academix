@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiBookOpen, FiFileText, FiVideo, FiHelpCircle, FiMessageSquare, FiBookmark, FiActivity } from 'react-icons/fi';
-import { getResources } from '../../services/resourceService';
+import { getRecentResources } from '../../../src/appwrite';
 import { useAuth } from '../../hooks/useAuth';
 
 const Dashboard = () => {
@@ -10,34 +10,20 @@ const Dashboard = () => {
   const [recentResources, setRecentResources] = useState([]);
   const [loading, setLoading] = useState(true);
   
+  // Move fetchRecentResources outside useEffect so you can call it elsewhere
+  const fetchRecentResources = async () => {
+    try {
+      setLoading(true);
+      const recent = await getRecentResources();
+      setRecentResources(recent);
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRecentResources = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch resources from different categories
-        const [notes, videos, pyqs] = await Promise.all([
-          getResources('notes'),
-          getResources('videos'),
-          getResources('pyqs'),
-        ]);
-        
-        // Combine and sort by date
-        const combined = [
-          ...notes.map(item => ({ ...item, type: 'notes' })),
-          ...videos.map(item => ({ ...item, type: 'videos' })),
-          ...pyqs.map(item => ({ ...item, type: 'pyqs' })),
-        ].sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-        
-        // Get most recent 5
-        setRecentResources(combined.slice(0, 5));
-      } catch (error) {
-        console.error('Error fetching resources:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
     fetchRecentResources();
   }, []);
   
@@ -97,7 +83,7 @@ const Dashboard = () => {
             >
               <Link 
                 to={item.link}
-                className="flex flex-col items-center justify-center rounded-xl bg-white p-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:bg-gray-800"
+                className="flex flex-col items-center justify-center rounded-xl bg-white p-4 text-center shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:bg-gray-800 border-b-4  dark:border-b-sky-600 dark:hover:border-b-sky-400"
               >
                 <div className={`mb-3 rounded-full p-3 text-white ${item.color}`}>
                   <item.icon size={24} />
@@ -121,12 +107,20 @@ const Dashboard = () => {
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
               Recent Resources
             </h2>
-            <Link 
-              to="/student/notes" 
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-            >
-              View all
-            </Link>
+            <div>
+              <Link 
+                to="/student/notes" 
+                className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+              >
+                View all
+              </Link>
+              <button
+                onClick={fetchRecentResources}
+                className="ml-4 text-xs px-2 py-1 rounded bg-primary-500 text-white hover:bg-primary-600"
+              >
+                Refresh
+              </button>
+            </div>
           </div>
           
           <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
@@ -164,13 +158,15 @@ const Dashboard = () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="badge badge-primary">
-                            {resource.type === 'notes' ? 'Notes' : 
-                             resource.type === 'videos' ? 'Video' : 
-                             resource.type === 'pyqs' ? 'PYQ' : 'Resource'}
+                            {resource.type === 'syllabus' ? ' Syllabus' : 
+                             resource.type === 'video' ? 'Video' : 
+                             resource.type === 'pyq' ? 'PYQ' :
+                             resource.type === 'notes' ? 'Notes' : 'Resource'
+                             }
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {/* <span className="text-xs text-gray-500 dark:text-gray-400">
                             {formatDate(resource.uploadDate)}
-                          </span>
+                          </span> */}
                         </div>
                         <h3 className="line-clamp-1 font-medium text-gray-900 dark:text-white">
                           {resource.title}

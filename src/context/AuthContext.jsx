@@ -55,15 +55,19 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       
       const userData = await loginUser(credentials);
-      setUser(userData);
+      // Extract role from labels
+      const role = userData.labels && userData.labels.length > 0 ? userData.labels[0] : 'student';
+      setUser({ ...userData, role });
       
       // Redirect based on role
-      if (userData.role === 'student') {
+      if (role === 'student') {
         navigate('/student/dashboard');
-      } else if (userData.role === 'teacher') {
+      } else if (role === 'teacher') {
         navigate('/teacher/dashboard');
-      } else if (userData.role === 'admin') {
+      } else if (role === 'admin') {
         navigate('/admin/dashboard');
+      } else {
+        navigate('/'); // fallback
       }
       
       return { success: true };

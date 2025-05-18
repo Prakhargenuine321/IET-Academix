@@ -13,9 +13,9 @@ const FilterBar = ({ onFilterChange }) => {
   });
   
   // Filter options
-  const branchOptions = ['All', 'Computer Science', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering'];
+  const branchOptions = ['All', 'Computer Science','Electronics Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering'];
   const yearOptions = ['All', '1', '2', '3', '4'];
-  const semesterOptions = ['All', '1', '2'];
+  const semesterOptions = ['All', '1', '2', '3', '4', '5', '6', '7', '8'];
   const subjectOptions = ['All', 'Data Structures', 'DBMS', 'Networks', 'Operating Systems', 'Machine Learning'];
   
   const handleFilterChange = (name, value) => {

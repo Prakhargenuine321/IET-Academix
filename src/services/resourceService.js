@@ -12,16 +12,14 @@ const resources = {
       year: '2',
       semester: '1',
       subject: 'Data Structures',
-      fileUrl: 'https://example.com/dsa-notes.pdf',
+      fileUrl: 'https://www.geeksforgeeks.org/dsa-tutorial-learn-data-structures-and-algorithms/',
       thumbnailUrl: 'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg',
       uploadedBy: 'Jane Teacher',
       uploadDate: '2023-09-15T10:30:00Z',
-      stats: {
-        likes: 45,
-        views: 120,
-        downloads: 67,
-        bookmarks: 28,
-      },
+      likes: 45,
+      views: 120,
+      downloads: 67,
+      bookmarks: 28,
     },
     {
       id: '2',
@@ -322,3 +320,19 @@ export const deleteResource = async (resourceType, id) => {
   
   return { success: true };
 };
+
+export async function updateResource(resourceType, id, updatedData) {
+  const response = await fetch(`/api/${resourceType}/${id}`, {
+    method: 'PUT', // or 'PATCH' depending on your backend
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(updatedData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to update resource');
+  }
+
+  return await response.json();
+}

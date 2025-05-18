@@ -138,7 +138,7 @@ const Sidebar = ({ navigationItems, userRole, isOpen, onClose }) => {
       
       {/* Desktop sidebar (always visible) */}
       <aside className="hidden w-64 border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800 md:block">
-        <div className={`flex items-center justify-between p-4 ${bgClass} text-white`}>
+        <div className={`flex items-center justify-between p-4 px-6 text-white bg-gradient-to-r from-blue-800 to-indigo-900`}>
           <h2 className="text-lg font-semibold">{title}</h2>
         </div>
         

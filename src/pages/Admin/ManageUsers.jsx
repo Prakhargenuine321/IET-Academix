@@ -1,6 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiUserPlus, FiTrash, FiEdit, FiMail, FiPhone, FiSearch, FiFilter } from 'react-icons/fi';
+import {
+  FiUserPlus,
+  FiTrash,
+  FiEdit,
+  FiMail,
+  FiPhone,
+  FiSearch,
+  FiFilter
+} from 'react-icons/fi';
+
+import { createUser} from '../../../src/appwrite'; // Make sure this path is correct based on your project structure
 
 const ManageUsers = () => {
   const [users, setUsers] = useState([
@@ -25,14 +35,14 @@ const ManageUsers = () => {
       status: 'active'
     }
   ]);
-  
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [filters, setFilters] = useState({
     role: 'all',
     status: 'all',
     search: ''
   });
-  
+
   const [newUser, setNewUser] = useState({
     name: '',
     email: '',
@@ -41,38 +51,47 @@ const ManageUsers = () => {
     branch: '',
     password: ''
   });
-  
-  // Handle form submission
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const user = {
-      id: String(users.length + 1),
-      ...newUser,
-      createdAt: new Date().toISOString(),
-      status: 'active'
-    };
-    
-    setUsers(prev => [user, ...prev]);
-    setShowAddForm(false);
-    setNewUser({
-      name: '',
-      email: '',
-      phone: '',
-      role: 'student',
-      branch: '',
-      password: ''
-    });
+    try {
+      const response = await account.create(
+        ID.unique(),
+        newUser.email,
+        newUser.password,
+        newUser.name
+      );
+
+      await account.updatePrefs({ role: newUser.role });
+
+      const user = {
+        id: response.$id,
+        ...newUser,
+        createdAt: new Date().toISOString(),
+        status: 'active'
+      };
+      setUsers(prev => [user, ...prev]);
+      setShowAddForm(false);
+      setNewUser({
+        name: '',
+        email: '',
+        phone: '',
+        role: 'student',
+        branch: '',
+        password: ''
+      });
+      alert('User created successfully!');
+    } catch (error) {
+      alert('Error creating user: ' + error.message);
+    }
   };
-  
-  // Handle user deletion
+
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       setUsers(prev => prev.filter(user => user.id !== id));
     }
   };
-  
-  // Filter users based on search and filters
+
   const filteredUsers = users.filter(user => {
     if (filters.role !== 'all' && user.role !== filters.role) return false;
     if (filters.status !== 'all' && user.status !== filters.status) return false;
@@ -86,26 +105,20 @@ const ManageUsers = () => {
     }
     return true;
   });
-  
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">Manage Users</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Add, edit, or remove users from the platform
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Add, edit, or remove users from the platform</p>
         </div>
-        
-        <button
-          onClick={() => setShowAddForm(prev => !prev)}
-          className="btn btn-primary"
-        >
+        <button onClick={() => setShowAddForm(prev => !prev)} className="btn btn-primary">
           <FiUserPlus className="mr-2" />
           Add User
         </button>
       </div>
-      
+
       {showAddForm && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -113,12 +126,10 @@ const ManageUsers = () => {
           className="mb-6 rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800"
         >
           <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">Add New User</h2>
-          
           <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+            {/* Name */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Full Name
-              </label>
+              <label className="mb-1 block text-sm font-medium">Full Name</label>
               <input
                 type="text"
                 value={newUser.name}
@@ -127,11 +138,9 @@ const ManageUsers = () => {
                 required
               />
             </div>
-            
+            {/* Email */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
+              <label className="mb-1 block text-sm font-medium">Email</label>
               <input
                 type="email"
                 value={newUser.email}
@@ -140,11 +149,9 @@ const ManageUsers = () => {
                 required
               />
             </div>
-            
+            {/* Phone */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Phone
-              </label>
+              <label className="mb-1 block text-sm font-medium">Phone</label>
               <input
                 type="tel"
                 value={newUser.phone}
@@ -152,11 +159,9 @@ const ManageUsers = () => {
                 className="input"
               />
             </div>
-            
+            {/* Role */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Role
-              </label>
+              <label className="mb-1 block text-sm font-medium">Role</label>
               <select
                 value={newUser.role}
                 onChange={e => setNewUser(prev => ({ ...prev, role: e.target.value }))}
@@ -167,11 +172,9 @@ const ManageUsers = () => {
                 <option value="teacher">Teacher</option>
               </select>
             </div>
-            
+            {/* Branch/Department */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Branch/Department
-              </label>
+              <label className="mb-1 block text-sm font-medium">Branch/Department</label>
               <input
                 type="text"
                 value={newUser.branch}
@@ -180,11 +183,9 @@ const ManageUsers = () => {
                 required
               />
             </div>
-            
+            {/* Password */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
+              <label className="mb-1 block text-sm font-medium">Password</label>
               <input
                 type="password"
                 value={newUser.password}
@@ -193,13 +194,9 @@ const ManageUsers = () => {
                 required
               />
             </div>
-            
+            {/* Buttons */}
             <div className="md:col-span-2 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="btn btn-ghost"
-              >
+              <button type="button" onClick={() => setShowAddForm(false)} className="btn btn-ghost">
                 Cancel
               </button>
               <button type="submit" className="btn btn-primary">
@@ -209,16 +206,13 @@ const ManageUsers = () => {
           </form>
         </motion.div>
       )}
-      
+
       {/* Filters */}
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
         <div className="flex items-center gap-2">
           <FiFilter className="text-gray-500 dark:text-gray-400" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-            Filters:
-          </span>
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters:</span>
         </div>
-        
         <div className="flex flex-1 flex-wrap items-center gap-4">
           <select
             value={filters.role}
@@ -229,7 +223,6 @@ const ManageUsers = () => {
             <option value="student">Students</option>
             <option value="teacher">Teachers</option>
           </select>
-          
           <select
             value={filters.status}
             onChange={e => setFilters(prev => ({ ...prev, status: e.target.value }))}
@@ -239,25 +232,22 @@ const ManageUsers = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          
-          <div className="flex-1">
-            <div className="relative">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                <FiSearch className="text-gray-500 dark:text-gray-400" />
-              </div>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                placeholder="Search users..."
-                className="input pl-10"
-              />
+          <div className="flex-1 relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <FiSearch className="text-gray-500 dark:text-gray-400" />
             </div>
+            <input
+              type="text"
+              value={filters.search}
+              onChange={e => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              placeholder="Search users..."
+              className="input pl-10"
+            />
           </div>
         </div>
       </div>
-      
-      {/* Users Table */}
+
+      {/* Table */}
       <div className="rounded-xl bg-white shadow-sm dark:bg-gray-800">
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -332,10 +322,7 @@ const ManageUsers = () => {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                     <div className="flex justify-end gap-2">
-                      <button
-                        className="rounded-full p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                        title="Edit"
-                      >
+                      <button className="rounded-full p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700" title="Edit">
                         <FiEdit size={16} />
                       </button>
                       <button
