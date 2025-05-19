@@ -28,6 +28,7 @@ const AdminLayout = () => {
     { name: 'Manage PYQs', href: '/admin/manage-pyqs', icon: 'FileQuestion' },
     { name: 'Manage Users', href: '/admin/manage-users', icon: 'Users' },
     { name: 'Announcements', href: '/admin/announcements', icon: 'Bell' },
+    { name: 'AI Help', href: '/admin/ai-help', icon: 'Zap' },
   ];
   
   return (

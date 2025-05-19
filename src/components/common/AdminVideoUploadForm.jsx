@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { FiX } from "react-icons/fi"; // Add this import
 
 const branchOptions = [
   "Computer Science",
@@ -21,11 +22,12 @@ const AdminVideoUploadForm = ({ onSubmit, loading, initialData, isEdit, onCancel
       semester: "1",
       fileUrl: "",
       thumbnailUrl: "",
+      playlistUrl: "",
     }
   );
 
   useEffect(() => {
-    if (initialData) setForm(initialData);
+    if (initialData) setForm({ ...initialData, playlistUrl: initialData.playlistUrl || "" });
   }, [initialData]);
 
   const [error, setError] = useState("");
@@ -52,6 +54,7 @@ const AdminVideoUploadForm = ({ onSubmit, loading, initialData, isEdit, onCancel
         semester: form.semester,
         fileUrl: "",
         thumbnailUrl: "",
+        playlistUrl: "",
       });
     } catch (err) {
       setError("Failed to upload video.");
@@ -59,7 +62,16 @@ const AdminVideoUploadForm = ({ onSubmit, loading, initialData, isEdit, onCancel
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+    <form onSubmit={handleSubmit} className="relative space-y-4 bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+      {/* Cross button */}
+      <button
+        type="button"
+        onClick={onCancel}
+        className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors"
+        aria-label="Close"
+      >
+        <FiX size={22} />
+      </button>
       <h2 className="text-xl font-semibold mb-2">Upload Video</h2>
       {error && <div className="text-red-600">{error}</div>}
       <div>
@@ -137,6 +149,17 @@ const AdminVideoUploadForm = ({ onSubmit, loading, initialData, isEdit, onCancel
           className="input w-full"
           placeholder="https://youtube.com/..."
           required
+        />
+      </div>
+      <div>
+        <label className="block mb-1 font-medium">Playlist URL (optional)</label>
+        <input
+          type="url"
+          name="playlistUrl"
+          value={form.playlistUrl}
+          onChange={handleChange}
+          className="input w-full"
+          placeholder="https://youtube.com/playlist?list=..."
         />
       </div>
       <div>

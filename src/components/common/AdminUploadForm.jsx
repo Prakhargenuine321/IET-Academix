@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FiLink, FiFile } from "react-icons/fi";
-import {FaLaptop} from "react-icons/fa"
- 
-const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, onCancel }) => {
+import { FiLink, FiFile, FiX } from "react-icons/fi";
+import { FaLaptop } from "react-icons/fa";
+
+const AdminUploadForm = ({
+  resourceType,
+  onUploadComplete,
+  initialData,
+  isEdit,
+  onCancel,
+}) => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -47,7 +53,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, 
     "Civil Engineering",
   ];
   const yearOptions = ["1", "2", "3", "4", "All"];
-  const semesterOptions = ["1", "2", "3", "4", "5", "6", "7", "8","All"];
+  const semesterOptions = ["1", "2", "3", "4", "5", "6", "7", "8", "All"];
   const subjectOptions = [
     "Data Structures",
     "DBMS",
@@ -55,7 +61,7 @@ const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, 
     "Operating Systems",
     "Machine Learning",
     "Power Electronics",
-    "Natural Language Processing"
+    "Natural Language Processing",
   ];
 
   const handleChange = (e) => {
@@ -117,8 +123,17 @@ const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800"
+      className="relative rounded-xl bg-white p-6 shadow-sm dark:bg-gray-800"
     >
+      {/* Cross button */}
+      <button
+        type="button"
+        onClick={onCancel}
+        className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition-colors"
+        aria-label="Close"
+      >
+        <FiX size={22} />
+      </button>
       <h2 className="mb-4 text-xl font-semibold text-gray-900 dark:text-white">
         Upload{" "}
         {resourceType === "pyqs"
@@ -196,19 +211,14 @@ const AdminUploadForm = ({ resourceType, onUploadComplete, initialData, isEdit, 
             <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Subject
             </label>
-            <select
+            <input
+              type="text"
               name="subject"
               value={formData.subject}
               onChange={handleChange}
               className="input"
-            >
-              <option value="">Select Subject</option>
-              {subjectOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+              placeholder="Enter subject"
+            />
           </div>
 
           {/* Year */}

@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { FiPlus, FiX, FiTrash, FiEdit, FiUpload, FiCopy } from "react-icons/fi";
+import { FiPlus, FiX, FiTrash, FiEdit, FiUpload, FiCopy, FiSearch } from "react-icons/fi";
 import AdminUploadForm from "../../components/common/AdminUploadForm";
 import {
   uploadSyllabus,
   getSyllabus,
+  updateSyllabus,
   deleteSyllabus,
   uploadFileToAppwrite,
   storage,
@@ -48,8 +49,13 @@ const ManageSyllabus = () => {
   // Handle syllabus upload
   const handleUploadComplete = async (newSyllabus) => {
     try {
-      const uploadedSyllabus = await uploadSyllabus(newSyllabus);
-      console.log("New syllabus uploaded:", uploadedSyllabus);
+      // Ensure semester and year are integers if present
+      const payload = {
+        ...newSyllabus,
+        semester: newSyllabus.semester ? parseInt(newSyllabus.semester, 10) : undefined,
+        year: newSyllabus.year ? parseInt(newSyllabus.year, 10) : undefined,
+      };
+      const uploadedSyllabus = await uploadSyllabus(payload);
       setSyllabusList((prev) => [...prev, uploadedSyllabus]);
       setShowUploadForm(false);
     } catch (error) {
@@ -63,7 +69,7 @@ const ManageSyllabus = () => {
       await deleteSyllabus(deleteId);
       setSyllabusList((prev) => prev.filter((item) => item.$id !== deleteId));
       setSuccessMessage("Syllabus deleted successfully!");
-      setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.error("Error deleting syllabus:", err);
       setError("Failed to delete syllabus");
@@ -95,7 +101,7 @@ const ManageSyllabus = () => {
     if (!selectedFile) return;
     setUploadingFile(true);
     try {
-      const response = await uploadFileToAppwrite(selectedFile); // Should return file object with $id
+      const response = await uploadFileToAppwrite(selectedFile);
       const url = storage.getFileView(response.bucketId, response.$id);
       setUploadedFileUrl(url);
       setShowFilePopup(true);
@@ -145,7 +151,7 @@ const ManageSyllabus = () => {
         </button>
       </div>
 
-      {/* Move FILTERS section here */}
+      {/* Filters */}
       <div className="mb-6 flex flex-wrap items-center gap-4 rounded-xl bg-white p-4 shadow-sm dark:bg-gray-800">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filters:</span>
@@ -178,7 +184,7 @@ const ManageSyllabus = () => {
         </div>
       </div>
 
-      {/* PDF Upload Section always visible */}
+      {/* PDF Upload Section */}
       <div className="mb-6">
         <div className="flex flex-col sm:flex-row sm:items-end gap-3 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 justify-center">
           <div className="flex-1">
@@ -218,14 +224,20 @@ const ManageSyllabus = () => {
             isEdit={!!editSyllabus}
             onUploadComplete={async (form) => {
               try {
+                // Ensure semester and year are integers if present
+                const payload = {
+                  ...form,
+                  semester: form.semester ? parseInt(form.semester, 10) : undefined,
+                  year: form.year ? parseInt(form.year, 10) : undefined,
+                };
                 if (editSyllabus) {
                   // Update existing syllabus
-                  await updateSyllabus(editSyllabus.$id, form);
-                  await fetchSyllabus(); // Refetch the list from backend
+                  await updateSyllabus(editSyllabus.$id, payload);
+                  await fetchSyllabus();
                   setSuccessMessage("Syllabus updated successfully!");
                 } else {
                   // Create new syllabus
-                  const uploadedSyllabus = await uploadSyllabus(form);
+                  const uploadedSyllabus = await uploadSyllabus(payload);
                   setSyllabusList((prev) => [...prev, uploadedSyllabus]);
                   setSuccessMessage("Syllabus uploaded successfully!");
                 }
@@ -328,7 +340,8 @@ const ManageSyllabus = () => {
                     onClick={() => setPreviewSyllabus(syllabus)}
                     className="btn bg-green-500 hover:bg-green-600 text-white w-full sm:w-auto transition-all duration-150"
                   >
-                    View
+                    <FiSearch/>
+                    Preview
                   </button>
                   <button
                     onClick={() => setEditSyllabus(syllabus)}

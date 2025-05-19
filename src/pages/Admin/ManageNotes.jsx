@@ -398,8 +398,8 @@ const ManageNotes = () => {
                   onClick={() => setPreviewNote(note)}
                   className="btn hover:bg-green-500 bg-green-400 flex-1 min-w-[110px] sm:min-w-[0]"
                 >
-                  <FiSearch />
-                  Notes
+                  <FiSearch/>
+                  Preview
                 </button>
                 <button
                   onClick={() => setEditNote({ show: true, data: note })}

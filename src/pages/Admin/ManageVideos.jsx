@@ -203,7 +203,7 @@ const ManageVideos = () => {
                       className="bg-green-400 hover:bg-green-500 text-white px-3 py-1 rounded flex-1"
                       onClick={() => setActiveVideo(video)}
                     >
-                      <span role="img" aria-label="Notes">📝</span> Notes
+                      <span role="img" aria-label="Notes">📝</span> Preview
                     </button>
                     <button
                       className="bg-blue-400 hover:bg-blue-500 text-white px-3 py-1 rounded flex-1"

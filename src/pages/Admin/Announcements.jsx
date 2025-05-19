@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiPlus, FiTrash, FiEdit, FiBell } from 'react-icons/fi';
-import { fetchAnnouncements, createAnnouncement, deleteAnnouncement } from "../../../src/appwrite";
+import { fetchAnnouncements, createAnnouncement, deleteAnnouncement, fetchUsers, sendBulkEmail } from "../../../src/appwrite";
 
 const ConfirmModal = ({ open, onConfirm, onCancel }) => (
   open ? (
@@ -10,8 +10,8 @@ const ConfirmModal = ({ open, onConfirm, onCancel }) => (
         <h2 className="text-lg font-semibold mb-4">Delete Announcement</h2>
         <p className="mb-6">Are you sure you want to delete this announcement?</p>
         <div className="flex justify-end gap-2">
-          <button className="btn btn-ghost" onClick={onCancel}>Cancel</button>
-          <button className="btn btn-error" onClick={onConfirm}>Delete</button>
+          <button className="btn bg-purple-400 hover:bg-purple-500" onClick={onCancel}>Cancel</button>
+          <button className="btn bg-red-400 hover:bg-red-500" onClick={onConfirm}>Delete</button>
         </div>
       </div>
     </div>
@@ -77,6 +77,27 @@ const Announcements = () => {
       });
       const data = await fetchAnnouncements();
       setAnnouncements(data);
+
+      let users = [];
+      if (formData.target[0] === "all") {
+        // All students
+        users = (await fetchUsers()).filter(u => u.role === "student");
+      } else {
+        // Students of a specific branch
+        users = (await fetchUsers()).filter(
+          u => u.role === "student" && u.branch === formData.target[0]
+        );
+      }
+      const emails = users.map(u => u.email);
+
+      console.log("Target users:", users);
+console.log("Emails to send:", emails);
+      // Call your Appwrite Function to send emails
+      await sendBulkEmail({
+        emails,
+        subject: `New Announcement: ${formData.title}`,
+        message: formData.content,
+      });
     } catch (error) {
       console.error("Create error:", error);
       setPopup({ show: true, message: "Failed to create announcement.", type: "error" });
@@ -186,6 +207,7 @@ const Announcements = () => {
                 <option value="Electrical Engineering">Electrical Engineering</option>
                 <option value="Mechanical Engineering">Mechanical Engineering</option>
                 <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Electronics Engineering">Electronics Engineering</option>
               </select>
             </div>
 
@@ -251,12 +273,6 @@ const Announcements = () => {
               </div>
 
               <div className="flex gap-2">
-                <button
-                  className="rounded-full p-1.5 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                  title="Edit"
-                >
-                  <FiEdit size={16} />
-                </button>
                 <button
                   onClick={() => setDeleteId(announcement.$id)}
                   className="rounded-full p-1.5 text-error-600 hover:bg-error-50 dark:text-error-400 dark:hover:bg-error-900/30"

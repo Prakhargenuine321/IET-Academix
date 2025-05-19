@@ -140,13 +140,6 @@ const PreviewPage = () => {
                 <FiCalendar className="mr-1" />
                 {formatDate(resource.uploadDate)}
               </div>
-
-              {type === 'videos' && resource.duration && (
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <FiClock className="mr-1" />
-                  {resource.duration}
-                </div>
-              )}
             </div>
 
             <div className="mt-2 flex flex-wrap gap-2">
@@ -155,6 +148,17 @@ const PreviewPage = () => {
               {resource.year && <span className="badge badge-accent">Year {resource.year}</span>}
               {resource.semester && <span className="badge badge-success">Semester {resource.semester}</span>}
             </div>
+
+            {type === 'videos' && resource.playlistUrl && (
+              <a
+                href={resource.playlistUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center text-blue-600 hover:underline"
+              >
+                View Full Playlist
+              </a>
+            )}
           </div>
 
           {type !== 'videos' && (

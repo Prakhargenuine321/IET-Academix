@@ -11,6 +11,7 @@ import AdminLayout from './layouts/AdminLayout';
 import Home from '../src/Home';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ResetPassword from './pages/Auth/ResetPassword';
 import StudentDashboard from './pages/Student/Dashboard';
 import Notes from './pages/Student/Notes';
 import Syllabus from './pages/Student/Syllabus';
@@ -28,35 +29,30 @@ import ManageSyllabus from './pages/Admin/ManageSyllabus';
 import ManageVideos from './pages/Admin/ManageVideos';
 import ManagePYQs from './pages/Admin/ManagePYQs';
 import Announcements from './pages/Admin/Announcements';
+import AdminAI from './pages/Admin/AdminAI';
 import NotFound from './pages/NotFound';
+import ProjectTeam from './components/common/ProjectTeam';
 import Unauthorized from './pages/Unauthorized';
 
 function App() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  const handleGetStarted = () => {
-    const userSession = JSON.parse(localStorage.getItem('userSession'));
-    console.log('User Session:', userSession); // Debugging log
-
-    if (userSession && userSession.isActive) {
-      console.log('Session is active. User role:', userSession.role); // Debugging log
-
-      // Redirect based on user role
-      if (userSession.role === 'student') {
-        navigate('/student/dashboard'); // Updated path
-      } else if (userSession.role === 'teacher') {
-        navigate('/teacher/dashboard'); // Updated path
-      } else if (userSession.role === 'admin') {
-        navigate('/admin/dashboard'); // Updated path
-      } else {
-        console.error('Unknown user role:', userSession.role); // Debugging log
-      }
-    } else {
-      console.log('No active session. Redirecting to login.'); // Debugging log
-      navigate('/login');
-    }
-  };
+  // const handleGetStarted = () => {
+  //   if (user && user.role) {
+  //     if (user.role === 'student') {
+  //       navigate('/student/dashboard');
+  //     } else if (user.role === 'teacher') {
+  //       navigate('/teacher/dashboard');
+  //     } else if (user.role === 'admin') {
+  //       navigate('/admin/dashboard');
+  //     } else {
+  //       navigate('/login');
+  //     }
+  //   } else {
+  //     navigate('/login');
+  //   }
+  // };
 
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (loading) {
@@ -75,6 +71,11 @@ function App() {
     return children;
   };
 
+  const { user: currentUser } = useAuth();
+  if (currentUser && currentUser.role) {
+    // navigate based on currentUser.role
+  }
+
   return (
     <Routes>
       {/* ✅ Public Home Page */}
@@ -84,6 +85,7 @@ function App() {
       <Route element={<AuthLayout key="auth-layout" />}>
         <Route path="/login" element={<Login key="login" />} />
         <Route path="/register" element={<Register key="register" />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       {/* ✅ Student Pages */}
@@ -136,8 +138,12 @@ function App() {
         <Route path="manage-pyqs" element={<ManagePYQs key="admin-manage-pyqs" />} />
         <Route path="manage-users" element={<ManageUsers key="admin-manage-users" />} />
         <Route path="announcements" element={<Announcements key="admin-announcements" />} />
+        <Route path="ai-help" element={<AdminAI key="admin-ai-help" />} />
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
+
+      {/* ✅ Project Team Page */}
+      <Route path="/project-team" element={<ProjectTeam />} />
 
       {/* Not Found */}
       <Route path="*" element={<NotFound key="not-found" />} />

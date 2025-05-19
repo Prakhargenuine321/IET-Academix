@@ -1,5 +1,6 @@
 // src/lib/appwrite.js
 import { Client, Account, Databases, ID, Storage, Messaging, Permission, Role, Query } from 'appwrite';
+import { Functions } from 'appwrite';
 
 const client = new Client();
 
@@ -13,6 +14,7 @@ export const storage = new Storage(client); // Initialize the Storage object
 export const messaging = new Messaging(client); // Initialize Messaging
 export {ID};
 
+const functions = new Functions(client); // <-- create an instance
 
 const DATABASE_ID = '682226b20031e283d0c2'; //Appwrite database ID here
 const COLLECTION_ID = '682226c2002333e24c49'; //Appwrite collection ID here
@@ -22,12 +24,28 @@ const ANNOUNCEMENT_ID = '6827803c0028e1d0a910'; //Announcement ID here
 const VIDEOS_COLLECTION_ID = '68289ba800093d6482c3'; //Video collection ID here
 const PYQ_COLLECTION_ID = '6828cc620034fa61a6d9'; //PYQ collection ID here
 const USER_COLLECTION_ID = '6827a9c1001c77e4485f'; //USER collection ID here
- 
+
+
 export const getCurrentUser = async () => {
   try {
     return await account.get();
   } catch {
     return null;
+  }
+};
+
+// Replace with your actual Appwrite Function ID for sending emails
+const BULK_EMAIL_FUNCTION_ID = '6827a577003e323ec776';
+
+export const sendBulkEmail = async ({ emails, subject, message }) => {
+  try {
+    const payload = JSON.stringify({ emails, subject, message });
+    console.log("Bulk email payload:", payload);
+    // ✅ CORRECT: use the instance
+    return await functions.createExecution(BULK_EMAIL_FUNCTION_ID, payload, true);
+  } catch (error) {
+    console.error('Error sending bulk email:', error);
+    throw error;
   }
 };
 
@@ -51,6 +69,19 @@ export const getResources = async (type, id = null) => {
     throw error;
   }
 };
+
+export async function getResourceNotes() {
+  try {
+    const res = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_ID
+    );
+    return res.documents; // should be an array
+  } catch (err) {
+    console.error('Error fetching notes:', err);
+    return [];
+  }
+}
 
 export const createNote = async (data) => {
   try {
