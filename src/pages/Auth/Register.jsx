@@ -4,8 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiUser, FiMail, FiPhone, FiLock, FiHash, FiCheckCircle
 } from 'react-icons/fi';
-import { account, ID } from '../../../src/appwrite'; // adjust as needed
-import { createUser } from '../../lib/api'; // Your backend API to insert users in DB
+import { account, ID, createUser } from '../../../src/appwrite'; // adjust as needed // Your backend API to insert users in DB
 
 const Register = () => {
   const [formData, setFormData] = useState({
