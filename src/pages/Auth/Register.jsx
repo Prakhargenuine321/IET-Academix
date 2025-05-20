@@ -139,4 +139,49 @@ const Register = () => {
             initial={{ y: -40, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -40, opacity: 0 }}
-            className="fixed top-6 left-1/2 -translate-x-1/2 bg-green-100 border border-green-300
+            className="fixed top-6 left-1/2 -translate-x-1/2 bg-green-100 border border-green-300 text-green-800 px-6 py-3 rounded-lg shadow-lg"
+          >
+            <FiCheckCircle className="mr-2 inline-block" />
+            {success}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <form onSubmit={handleSubmit}>
+        <h2 className="text-2xl font-bold text-center mb-6">Complete Registration</h2>
+
+        {error && <div className="text-red-600 mb-3">{error}</div>}
+
+        {/* Name */}
+        <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" required className="input mb-3" />
+
+        {/* Email (disabled) */}
+        <input type="email" name="email" value={formData.email} disabled className="input mb-3" />
+
+        {/* Phone */}
+        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" required className="input mb-3" />
+
+        {/* Roll Number */}
+        <input type="text" name="rollNo" value={formData.rollNo} onChange={handleChange} placeholder="Roll Number" required className="input mb-3" />
+
+        {/* Branch */}
+        <select name="branch" value={formData.branch} onChange={handleChange} required className="input mb-3">
+          <option value="">Select Branch</option>
+          {branchOptions.map(branch => <option key={branch}>{branch}</option>)}
+        </select>
+
+        {/* Password */}
+        <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" required className="input mb-3" />
+
+        {/* Confirm Password */}
+        <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Confirm Password" required className="input mb-4" />
+
+        <button type="submit" disabled={loading} className="btn btn-primary w-full">
+          {loading ? 'Registering...' : 'Register'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Register;
