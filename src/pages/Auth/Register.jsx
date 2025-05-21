@@ -80,12 +80,9 @@ const Register = () => {
       // Send password reset link so user can set their password
       await sendPasswordReset(formData.email, window.location.origin + '/reset-password');
 
-      // Log out the user so they can log in with their new password
-      await account.deleteSession('current');
-
       setSuccess('Registration successful! Please check your email to set your password. After setting your password, you can log in.');
-      // Optionally, redirect to login page here
-      // navigate('/login');
+      // DO NOT log out here!
+      // Optionally, you can log out after password is set, or prompt user to log out manually.
     } catch (err) {
       setError(err.message || 'Registration failed');
     } finally {
