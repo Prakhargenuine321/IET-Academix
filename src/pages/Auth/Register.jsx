@@ -19,8 +19,8 @@ const Register = () => {
     phone: '',
     branch: '',
     rollNo: '',
-    password: '',
-    confirmPassword: '',
+    // password: '',
+    // confirmPassword: '',
   });
 
   // Add this useEffect to check for authenticated user on mount
@@ -55,8 +55,8 @@ const Register = () => {
     if (!formData.phone.trim()) return setError('Phone is required');
     if (!formData.branch.trim()) return setError('Branch is required');
     if (!formData.rollNo.trim()) return setError('Roll Number is required');
-    if (!formData.password.trim()) return setError('Password is required');
-    if (formData.password !== formData.confirmPassword) return setError('Passwords do not match');
+    // if (!formData.password.trim()) return setError('Password is required');
+    // if (formData.password !== formData.confirmPassword) return setError('Passwords do not match');
     return true;
   };
 
