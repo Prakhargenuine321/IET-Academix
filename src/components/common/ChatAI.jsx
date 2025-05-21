@@ -178,7 +178,8 @@ const ChatAI = () => {
   );
 
   return (
-    <div className="flex h-full flex-col rounded-xl bg-white shadow-sm dark:bg-gray-800">
+    <div className="flex flex-col rounded-xl bg-white shadow-sm dark:bg-gray-800 h-full min-h-[60vh] sm:min-h-[80vh] md:min-h-0 md:h-full"
+  >
       <div className="border-b border-gray-200 p-4 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
           <span className="text-blue-500">🤖</span> AI Assistant
