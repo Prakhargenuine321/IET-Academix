@@ -313,7 +313,6 @@ const Register = () => {
           </div>
         </div> */}
 
-        {/* Confirm Password */}
         {/* <div className="mb-6">
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Confirm Password*
