@@ -293,7 +293,7 @@ const Register = () => {
         </div>
 
         {/* Password */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Password*
           </label>
@@ -311,10 +311,10 @@ const Register = () => {
               required
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Confirm Password */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Confirm Password*
           </label>
@@ -332,7 +332,7 @@ const Register = () => {
               required
             />
           </div>
-        </div>
+        </div> */}
 
         <button
           type="submit"
