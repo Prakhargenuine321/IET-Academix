@@ -28,6 +28,7 @@ const ResetPassword = () => {
     try {
       await account.updateRecovery(userId, secret, password, confirmPassword);
       setStatus("Password updated! You can now log in.");
+      await account.deleteSessions();
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setStatus(err.message || "Failed to reset password.");
