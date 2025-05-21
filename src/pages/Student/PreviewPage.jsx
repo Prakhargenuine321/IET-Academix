@@ -6,6 +6,9 @@ import ChatAI from '../../components/common/ChatAI';
 import { getResources, fetchVideos, fetchPYQs } from '../../../src/appwrite';
 import YouTube from 'react-youtube';
 
+// Utility to detect mobile device
+const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 const PreviewPage = () => {
   const { type, id } = useParams();
   const navigate = useNavigate();
@@ -200,33 +203,31 @@ const PreviewPage = () => {
             </div>
           ) : (
             <div className="flex h-full w-full flex-col p-0 md:p-4">
-              {/* PDF Preview Header */}
-              {/* <div className="flex items-center justify-between px-4 py-2 bg-gray-100 dark:bg-gray-900 rounded-t-lg border-b dark:border-gray-700">
-                <span className="font-medium text-gray-800 dark:text-gray-100 truncate">
-                  {resource.title}
-                </span>
-                <button
-                  onClick={handleDownload}
-                  className="btn btn-sm btn-primary flex items-center gap-1"
-                >
-                  <FiDownload />
-                  Download
-                </button>
-              </div> */}
               {/* PDF Preview Area */}
-              <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 rounded-b-lg">
-                <iframe
-                  src={resource.fileUrl}
-                  title={resource.title}
-                  className="w-full"
-                  style={{
-                    minHeight: 400,
-                    height: '70vh',
-                    border: 'none',
-                    borderRadius: '0 0 0.75rem 0.75rem',
-                  }}
-                  loading="lazy"
-                />
+              <div className="flex-1 overflow-auto bg-gray-50 dark:bg-gray-900 rounded-b-lg flex items-center justify-center">
+                {isMobile() ? (
+                  <a
+                    href={resource.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                  >
+                    📄 View PDF
+                  </a>
+                ) : (
+                  <iframe
+                    src={resource.fileUrl}
+                    title={resource.title}
+                    className="w-full"
+                    style={{
+                      minHeight: 400,
+                      height: '70vh',
+                      border: 'none',
+                      borderRadius: '0 0 0.75rem 0.75rem',
+                    }}
+                    loading="lazy"
+                  />
+                )}
               </div>
             </div>
           )}

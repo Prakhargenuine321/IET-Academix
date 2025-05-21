@@ -6,6 +6,9 @@ import ChatAI from '../../components/common/ChatAI';
 import { getSyllabusById } from '../../../src/appwrite'; // Ensure this function fetches syllabus data correctly
 import YouTube from 'react-youtube';
 
+// Utility to detect mobile device
+const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 const PreviewPageSyllabus = () => {
   const { id } = useParams(); // Use only `id` since this is specific to syllabus
   const navigate = useNavigate();
@@ -146,23 +149,30 @@ const PreviewPageSyllabus = () => {
           className="h-1/2 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-gray-800 lg:h-full lg:w-3/5"
         >
           <div className="flex h-full flex-col items-center justify-center p-4">
-            {/* <img
-              src={resource.thumbnailUrl}
-              alt={resource.title}
-              className="mb-4 h-16 w-16 rounded-lg object-cover"
-            />
-            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
-              PDF Preview
-            </h3> */}
             <div className="w-full max-w-full h-96 overflow-auto rounded-lg border bg-black/80 flex items-center justify-center">
               {resource.fileUrl ? (
-                <iframe
-                  src={resource.fileUrl}
-                  title="PDF Preview"
-                  className="w-full"
-                  style={{ minHeight: 350, background: "#222",border: 'none',
-                    borderRadius: '0 0 0.75rem 0.75rem', }}
-                />
+                isMobile() ? (
+                  <a
+                    href={resource.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                  >
+                    📄 View PDF
+                  </a>
+                ) : (
+                  <iframe
+                    src={resource.fileUrl}
+                    title="PDF Preview"
+                    className="w-full"
+                    style={{
+                      minHeight: 350,
+                      background: "#222",
+                      border: 'none',
+                      borderRadius: '0 0 0.75rem 0.75rem',
+                    }}
+                  />
+                )
               ) : (
                 <p className="text-center text-sm text-gray-600 dark:text-gray-400">
                   PDF preview is not available. No file URL provided.
