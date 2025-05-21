@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUser, FiMail, FiPhone, FiLock, FiUserPlus, FiHash, FiCheckCircle } from 'react-icons/fi';
 import { account, ID, createUser } from '../../../src/appwrite'; // adjust path if needed
+import { sendPasswordReset } from '../../services/authService'; // adjust path if needed
 
 const Register = () => {
   const [loading, setLoading] = useState(false);
@@ -66,7 +67,6 @@ const Register = () => {
     if (!validateForm()) return;
     setLoading(true);
     try {
-      // Only store in your user collection, don't create Auth user again
       await createUser({
         name: formData.name,
         email: formData.email,
@@ -74,11 +74,14 @@ const Register = () => {
         branch: formData.branch,
         rollNo: formData.rollNo,
         role: 'student',
-        authId: googleUser.$id // Store Appwrite Auth ID
+        authId: googleUser.$id
       });
 
-      setSuccess('Registration successful!');
-      // ...reset form or redirect as needed...
+      // Send password reset link so user can set their password
+      await sendPasswordReset(formData.email, window.location.origin + '/reset-password');
+
+      setSuccess('Registration successful! Please check your email to set your password.');
+      // Optionally, redirect or reset form here
     } catch (err) {
       setError(err.message || 'Registration failed');
     } finally {
