@@ -77,6 +77,9 @@ const Register = () => {
         authId: googleUser.$id
       });
 
+      // Update the user's name in Appwrite Auth
+    await account.updateName(formData.name);
+
       // Send password reset link so user can set their password
       await sendPasswordReset(formData.email, window.location.origin + '/reset-password');
 
